@@ -102,22 +102,26 @@ class AdditiveLayerStore(LayerStore):
         super().__init__()
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
+
         if self.current_layers.is_empty():
             self.current_color = start
             return start
 
         elif self.current_color == None:
-            while self.current_layers:
+            for _  in range(self.current_layers.length):
                 new_layer = self.current_layers.serve()
-                served_layer = new_layer.apply(start, 0 , 1, 1)
+                self.current_layers.append(new_layer)
+                served_layer = new_layer.apply(start, timestamp , x, y)
                 self.current_color = served_layer
-            return served_layer
+            return self.current_color
 
         else:
-            new_layer:Layer = self.current_layers.serve()
-            served_layer = new_layer.apply(self.current_color, 0, 1, 1)
-            self.current_color = served_layer
-            return served_layer
+            for _ in range(self.current_layers.length):
+                new_layer:Layer = self.current_layers.serve()
+                self.current_layers.append(new_layer)
+                served_layer = new_layer.apply(self.current_color, timestamp, x, y)
+                self.current_color = served_layer
+            return self.current_color
 
     def add(self, layer: Layer) -> bool:
         self.current_layers.append(layer)
@@ -130,17 +134,15 @@ class AdditiveLayerStore(LayerStore):
     def special(self):
         stack = ArrayStack(100)
 
-        while self.current_layers.is_empty == False:
+        while self.current_layers.is_empty() == False:
             served_layer = self.current_layers.serve()
             stack.push(served_layer)
         
-        while stack.is_empty == False:
+        while stack.is_empty() == False:
             peeked_layer = stack.peek()
             stack.pop()
             self.current_layers.append(peeked_layer)
-
-    
-
+        
 
     
 
