@@ -53,3 +53,7 @@ class TestSetLayer(unittest.TestCase):
         self.assertEqual(s.get_color((0, 0, 0), 7, 0, 0), (0, 0, 0))
         s.add(invert)
         self.assertEqual(s.get_color((0, 0, 0), 7, 0, 0), (255, 255, 255))
+
+
+if __name__ == '__main__':
+    unittest.main()
