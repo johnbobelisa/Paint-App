@@ -33,14 +33,14 @@ class Grid:
         self.y = y
         self.brush_size = self.DEFAULT_BRUSH_SIZE
 
-        self.grid = ArrayR(x)
+        self.grid = ArrayR(x)      # Create an array of size x
 
-        for i in range(x):
-            self.grid[i] = ArrayR(y)
-            for j in range(y):
-                if self.draw_style == self.DRAW_STYLE_SET:
-                    self.grid[i][j] = SetLayerStore()
-                elif self.draw_style == self.DRAW_STYLE_ADD:
+        for i in range(x):    # Outer loop iterates x times        
+            self.grid[i] = ArrayR(y)    #Creates a "mini array" inside the array at index i
+            for j in range(y):          #inner loop iterates y times
+                if self.draw_style == self.DRAW_STYLE_SET: #set the "mini array" that is accessed by i and j as a                                                     
+                    self.grid[i][j] = SetLayerStore()      #layer store according to self.draw style 
+                elif self.draw_style == self.DRAW_STYLE_ADD:   
                     self.grid[i][j] = AdditiveLayerStore()
                 elif self.draw_style == self.DRAW_STYLE_SEQUENCE:
                     self.grid[i][j] = SequenceLayerStore()
@@ -49,7 +49,6 @@ class Grid:
        
     def __getitem__(self, index):
         return self.grid[index]
-
 
     
     def increase_brush_size(self):
@@ -81,8 +80,8 @@ class Grid:
         """
         Activate the special affect on all grid squares.
         """
-        
-        for grid in self.grid:
-            SetLayerStore().special
+        for i in range(self.x):
+            for j in range(self.y):
+                self.grid[i][j].special()
 
     
