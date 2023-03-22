@@ -303,21 +303,29 @@ class MyWindow(arcade.Window):
         px: x position of the brush.
         py: y position of the brush.
         """
+        d = self.grid.brush_size
+
+        vicinity_x = range(0, self.GRID_SIZE_X-1)
+        vicinity_y = range(0, self.GRID_SIZE_Y-1)
+
+        variables_x = range(px-d, px+d)
+        variables_y = range(py-d, py+d) 
+
+        self.grid[px][py].add(layer)
+
+        for var in variables_x:
+            if var in vicinity_x :
+                    self.grid[var][py].add(layer)
+            continue
+
+        for var1 in variables_y: 
+            if var1 in vicinity_y:
+                self.grid[px][var1].add(layer)
+            continue
         
-        # # Define the vicinity of the brush
-        vicinity = [(x, y) for x in range(max(0, px - 1), min(self.GRID_SIZE_X, px + 2)) for y in range(max(0, py - 1), min(self.GRID_SIZE_Y, py + 2))]
+        
 
 
-        # Apply the layer to each square in the vicinity
-        for x, y in vicinity:
-            i = Grid("ADD", x, y).brush_size
-            if 0 <= x < self.GRID_SIZE_X and 0 <= y < self.GRID_SIZE_Y:
-                color = LayerStore().get_color(layer, 0 , x, y)
-                self.grid[x-i][y] = color
-                self.grid[x+i][y] = color
-                self.grid[x][y] = color
-                self.grid[x][y-i] = color
-                self.grid[x][y+i] = color
 
     def on_undo(self):
         """Called when an undo is requested."""
@@ -329,7 +337,7 @@ class MyWindow(arcade.Window):
 
     def on_special(self):
         """Called when the special action is requested."""
-        Grid.special()
+        self.grid.special()
 
     def on_replay_start(self):
         """Called when the replay starting is requested."""
