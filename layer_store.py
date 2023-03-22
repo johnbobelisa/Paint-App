@@ -5,6 +5,8 @@ from layers import *
 from referential_array import *
 from queue_adt import *
 from stack_adt import *
+from array_sorted_list import *
+from data_structures.sorted_list_adt import *
 
 class LayerStore(ABC):
 
@@ -54,8 +56,7 @@ class SetLayerStore(LayerStore):
 
     def __init__(self) -> None:
         super().__init__()
-        
-        
+
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
         if self.current_layer == None:
@@ -156,13 +157,77 @@ class SequenceLayerStore(LayerStore):
         In the event of two layers being the median names, pick the lexicographically smaller one.
     """
 
+    current_layers = ArraySortedList(100)
+    current_color = None
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
+        if self.current_layers.is_empty():
+            return start
+
+        else:
+            for layer in self.current_layers:
+                if layer.applying() == True:
+                    temp_list = ArraySortedList(100).add(layer)
+                
+            new_list = self.index_sort(temp_list)
+            for item in new_list:  
+                item.value.apply(start, timestamp, x, y)
+
+
+
+                    
+
     def add(self, layer: Layer) -> bool:
-        return super().add(layer)
+        item = ListItem(layer, layer.index)
+        item.applying = True
+        self.current_layers.add(item)
+        return True
     
     def erase(self, layer: Layer) -> bool:
-        return super().erase(layer)
-    
+        item_ = ListItem(layer, layer.index)
+        for item in self.current_layers:
+            if item_ == item and item.applying != False:
+                item.applying = False
+                return True
+            continue
+        
+
     def special(self):
-        return super().special()
+        new_list:ArraySortedList = self.alphabetical_sort(self.current_layers)
+        temp = self.current_layers.length % 2
+        layer_to_delete = None
+        index_ = 0
+        if temp != 0:
+            index_ = self.current_layers.length // 2
+            layer_to_delete = new_list[index_]
+        else:
+            index_ = (self.current_layers.length // 2) - 1
+            new_list.delete_at_index(index_)
+            layer_to_delete = new_list[index_]
+
+        for item in self.current_layers:
+            if item == layer_to_delete:
+                index = self.current_layers.index(item)
+                self.current_layers.delete_at_index(index)
+                break
+        
+        
+    def index_sort(lst:ArraySortedList(ListItem)):
+        n = len(lst)
+        for i in range(n):
+            for j in range(n-i-1):
+                if lst[j].key > lst[j+1].key:
+                    lst[j], lst[j+1] = lst[j+1], lst[j]
+        return lst
     
     
+    def alphabetical_sort(lst):
+        n = len(lst)
+        for i in range(n):
+            for j in range(n-i-1):
+                if lst[j] > lst[j+1]:
+                    lst[j], lst[j+1] = lst[j+1], lst[j]
+        return lst
