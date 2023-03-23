@@ -8,6 +8,7 @@ from stack_adt import *
 from array_sorted_list import *
 from sorted_list_adt import *
 from data_structures.abstract_list import *
+from data_structures.bset import *
 
 class LayerStore(ABC):
 
@@ -159,51 +160,64 @@ class SequenceLayerStore(LayerStore):
     """
     
     current_layers = ArraySortedList(1)
-    special_layers = ArraySortedList(1)
-    current_layers.reset
+    applying = BSet(10)
+    not_applying = BSet(10)
     current_color = None
 
     def __init__(self) -> None:
         super().__init__()
 
-    
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
+
         if self.current_layers.is_empty():
             self.current_color = start
             return start
         
         else:
-            for layer in self.current_layers:
-                layer_value = layer.value
-                if self.current_color == None:
-                    new_layer = layer_value.apply(start, timestamp, x, y)
-                    self.current_color = new_layer
-                
-                else:
-                    new_layer = layer_value.apply(self.current_color, timestamp, x, y)
-                    self.current_color = new_layer
+            
+            applied_layers = self.applying.difference(self.not_applying)
+            
+            
+            for layers in self.current_layers:
+                if layers == None:
+                    break
+                layer_index = layers.key
+                if layer_index in applied_layers:
                     
+                    if self.current_color == None:
+                        layer_color = layers.value
+                        new_layers = layer_color.apply(start,timestamp,x,y)
+                        self.current_color = new_layers
+                        
+                    else:
+                        layer_color_ = layers.value
+                        new_layers = layer_color_.apply(self.current_color, timestamp, x, y)
+                        self.current_color = new_layers
+            
             return self.current_color
+            
             
                 
     def add(self, layer: Layer) -> bool:
-        element = ListItem(layer, layer.index)
-        if self.current_layers.is_full():
-            self.current_layers._resize()
-            self.current_layers.add(element)
-        else:
-            self.current_layers.add(element)
+        element = ListItem(value=layer, key=layer.index+1)
+        self.current_layers.add(element)
+
+        self.applying.add(layer.index+1)
         return True
 
+
     def erase(self, layer: Layer) -> bool:
-        element = ListItem(layer, layer.index)
-        e_index = self.current_layers.index(element)
-        self.current_layers.delete_at_index(e_index-2)
+        element = ListItem(value=layer, key=layer.index+1)
+        self.not_applying.add(layer.index+1)
         return True
-    
+
     def special(self):
         #black, blue, darken, green, invert, lighten, rainbow, red, sparkle
+        # print(self.current_layers)
+        temporary_layers = ArraySortedList(0)
+        the_index = 0
+
         item1 = ListItem(black, 1)
         item2 = ListItem(blue, 2)
         item3 = ListItem(darken, 3)
@@ -214,14 +228,52 @@ class SequenceLayerStore(LayerStore):
         item8 = ListItem(red, 8)
         item9 = ListItem(sparkle, 9)
 
-        elements = 1,2,3,4,5,6,7,8,9
+        elements = item1, item2, item3, item4, item5, item6, item7, item8, item9
+
+        for layers in self.current_layers:
+            if layers == None:
+                    break
+            for items in elements:
+                if items.value == layers.value:
+                    temporary_layers.add(items)
+                    
+        n = temporary_layers.length 
+
+        if n % 2 == 0:
+            the_index = (n // 2) - 1
+        else:
+            the_index = n // 2
 
 
-    def alphabetical_sort(lst:ArrayStack):
-        n = lst.length
-        for i in range(n):
-            for j in range(n-i-1):
-                if lst[j] > lst[j+1]:
-                    lst[j], lst[j+1] = lst[j+1], lst[j]
-        return lst
+        temporary_layers.delete_at_index(the_index)
+        # print(temporary_layers)
+        
+        self.current_layers = ArraySortedList(0)
+        
+        for elems in temporary_layers:
+            new_layer = elems.value
+            self.add(new_layer)     #problem is here!
+
+        
+        
+        
+
+                
+
+
+
+                
+                
+
+
+        
+
+
+    # def alphabetical_sort(lst:ArrayStack):
+    #     n = lst.length
+    #     for i in range(n):
+    #         for j in range(n-i-1):
+    #             if lst[j] > lst[j+1]:
+    #                 lst[j], lst[j+1] = lst[j+1], lst[j]
+    #     return lst
    
