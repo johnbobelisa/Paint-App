@@ -19,9 +19,9 @@ class TestSeqLayer(unittest.TestCase):
     @number("3.2")
     def test_layers(self):
         s = SequenceLayerStore()
-        s.add(black)
+        s.add(black) 
         # Light comes after black.
-        s.add(lighten)
+        s.add(lighten)  # current_layer is [black,lighten]
         self.assertEqual(s.get_color((100, 100, 100), 0, 20, 40), (40, 40, 40))
         s.erase(lighten)
         s.add(rainbow)
@@ -69,3 +69,6 @@ class TestSeqLayer(unittest.TestCase):
         self.assertEqual(s.get_color((100, 100, 100), 7, 0, 0), (0, 0, 0))
         s.erase(black)
         self.assertEqual(s.get_color((100, 100, 100), 7, 0, 0), (91, 214, 104))
+
+if __name__ == '__main__':
+    unittest.main()

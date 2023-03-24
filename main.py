@@ -305,23 +305,32 @@ class MyWindow(arcade.Window):
         """
         d = self.grid.brush_size
 
-        vicinity_x = range(0, self.GRID_SIZE_X-1)
-        vicinity_y = range(0, self.GRID_SIZE_Y-1)
+        vicinity_x = range(0, self.grid.x)
+        vicinity_y = range(0, self.grid.y)
 
-        variables_x = range(px-d, px+d)
-        variables_y = range(py-d, py+d) 
+        # variables_x = range(px-d, px+d) #(0,4)
+        # variables_y = range(py-d, py+d) #(0,4)
 
-        self.grid[px][py].add(layer)
+        variables_x = range(px-d, py+d)
+        variables_y = range(py-d, py+d)
 
-        for var in variables_x:
-            if var in vicinity_x :
-                    self.grid[var][py].add(layer)
-            continue
+        
+        #(px-2, py-2), (px-1, py-1), (px, py-2), (px+1, py-1), (px+2, py), (px+1, py+1), (px, py+2), (px-1, py+1)
+        #(px-2, py-2), (px-1, py-1), (px-1, py+1), (px, py-2), (px, py+2), (px+1, py-1), (px+1, py+1), (px+2, py)
 
-        for var1 in variables_y: 
-            if var1 in vicinity_y:
-                self.grid[px][var1].add(layer)
-            continue
+        
+                
+
+        # for var in variables_x:
+        #     if var in vicinity_x :
+        #             self.grid[var][py].add(layer)
+
+        # for var1 in variables_y: 
+        #     if var1 in vicinity_y:
+        #         self.grid[px][var1].add(layer)
+
+
+            
         
         
 

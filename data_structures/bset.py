@@ -108,6 +108,7 @@ if __name__ == '__main__':
     s.add(1)
     s.add(4)
     print(f'S = {s}')
+    
     t = BSet(3)
     t.add(4)
     t.add(2)

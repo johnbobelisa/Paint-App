@@ -53,11 +53,12 @@ class SetLayerStore(LayerStore):
     - special: Invert the colour output.
     """
 
-    current_layer = None
-    current_color = None
+    
 
     def __init__(self) -> None:
         super().__init__()
+        self.current_layer = None
+        self.current_color = None
 
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
@@ -98,10 +99,10 @@ class AdditiveLayerStore(LayerStore):
     - special: Reverse the order of current layers (first becomes last, etc.)
     """
     
-    current_layers = CircularQueue(100)
-    current_color = None
 
     def __init__(self) -> None:
+        self.current_layers = CircularQueue(100)
+        self.current_color = None
         super().__init__()
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
@@ -159,13 +160,14 @@ class SequenceLayerStore(LayerStore):
         In the event of two layers being the median names, pick the lexicographically smaller one.
     """
     
-    current_layers = ArraySortedList(1)
-    applying = BSet(10)
-    not_applying = BSet(10)
-    current_color = None
+    
 
     def __init__(self) -> None:
         super().__init__()
+        self.current_layers = ArraySortedList(1)
+        self.applying = BSet(10)
+        self.not_applying = BSet(10)
+        self.current_color = None
 
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
@@ -181,7 +183,8 @@ class SequenceLayerStore(LayerStore):
             
             for layers in self.current_layers:
                 if layers == None:
-                    break
+                    break    
+                
                 layer_index = layers.key
                 if layer_index in applied_layers:
                     
@@ -201,8 +204,9 @@ class SequenceLayerStore(LayerStore):
                 
     def add(self, layer: Layer) -> bool:
         element = ListItem(value=layer, key=layer.index+1)
-        self.current_layers.add(element)
-
+        if element not in self.current_layers:
+            self.current_layers.add(element)
+        
         self.applying.add(layer.index+1)
         return True
 
@@ -214,7 +218,6 @@ class SequenceLayerStore(LayerStore):
 
     def special(self):
         #black, blue, darken, green, invert, lighten, rainbow, red, sparkle
-        # print(self.current_layers)
         temporary_layers = ArraySortedList(0)
         the_index = 0
 
@@ -246,34 +249,12 @@ class SequenceLayerStore(LayerStore):
 
 
         temporary_layers.delete_at_index(the_index)
-        # print(temporary_layers)
-        
         self.current_layers = ArraySortedList(0)
         
         for elems in temporary_layers:
+            if elems == None:
+                break
             new_layer = elems.value
-            self.add(new_layer)     #problem is here!
+            self.add(new_layer)                 #problem is here!
 
         
-        
-        
-
-                
-
-
-
-                
-                
-
-
-        
-
-
-    # def alphabetical_sort(lst:ArrayStack):
-    #     n = lst.length
-    #     for i in range(n):
-    #         for j in range(n-i-1):
-    #             if lst[j] > lst[j+1]:
-    #                 lst[j], lst[j+1] = lst[j+1], lst[j]
-    #     return lst
-   

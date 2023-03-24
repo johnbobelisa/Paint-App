@@ -4,7 +4,7 @@
 """
 
 from referential_array import ArrayR
-from data_structures.sorted_list_adt import *
+from sorted_list_adt import *
 
 __author__ = 'Maria Garcia de la Banda and Brendon Taylor. Modified by Alexey Ignatiev and Graeme Gange'
 __docformat__ = 'reStructuredText'
