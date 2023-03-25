@@ -6,7 +6,7 @@ No need to edit unless adding new features.
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from referential_array import ArrayR
+from data_structures.referential_array import ArrayR
 
 LAYERS: ArrayR[Layer] = ArrayR(20)
 cur_layer_index = 0

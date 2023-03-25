@@ -1,9 +1,14 @@
 from __future__ import annotations
 from action import PaintAction
 from grid import Grid
+from data_structures.stack_adt import *
+
 
 class UndoTracker:
 
+    def __init__(self) -> None:
+        self.tree_of_actions = ArrayStack(10000)
+        
     def add_action(self, action: PaintAction) -> None:
         """
         Adds an action to the undo tracker.
@@ -11,7 +16,8 @@ class UndoTracker:
         If your collection is already full,
         feel free to exit early and not add the action.
         """
-        raise NotImplementedError()
+        self.tree_of_actions.push(action)
+
 
     def undo(self, grid: Grid) -> PaintAction|None:
         """
@@ -20,7 +26,7 @@ class UndoTracker:
 
         :return: The action that was undone, or None.
         """
-        raise NotImplementedError()
+        pass
 
     def redo(self, grid: Grid) -> PaintAction|None:
         """

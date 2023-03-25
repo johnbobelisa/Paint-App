@@ -2,11 +2,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from layer_util import *
 from layers import *
-from referential_array import *
-from queue_adt import *
-from stack_adt import *
-from array_sorted_list import *
-from sorted_list_adt import *
+from data_structures.referential_array import *
+from data_structures.queue_adt import *
+from data_structures.stack_adt import *
+from data_structures.array_sorted_list import *
+from data_structures.sorted_list_adt import *
 from data_structures.abstract_list import *
 from data_structures.bset import *
 
@@ -79,12 +79,12 @@ class SetLayerStore(LayerStore):
 
     def add(self, layer: Layer) -> bool:
         self.current_layer = layer
-        return True
+        return self.current_layer == layer
         
      
     def erase(self, layer: Layer) -> bool:
         self.current_layer = None
-        return True
+        return self.current_layer == None
     
     def special(self):
         self.current_layer = invert
