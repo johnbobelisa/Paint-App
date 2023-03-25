@@ -83,5 +83,8 @@ class Grid:
         for i in range(self.x):
             for j in range(self.y):
                 self.grid[i][j].special()
+                
+
+            
 
     

@@ -101,7 +101,14 @@ class AdditiveLayerStore(LayerStore):
     
 
     def __init__(self) -> None:
-        self.current_layers = CircularQueue(100)
+        layer_counter = 0
+        temp = get_layers()
+        for layer in temp:
+            if layer == None:
+                break
+            layer_counter += 1
+        
+        self.current_layers = CircularQueue(100*layer_counter)
         self.current_color = None
         super().__init__()
 

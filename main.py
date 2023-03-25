@@ -305,36 +305,13 @@ class MyWindow(arcade.Window):
         """
         d = self.grid.brush_size
 
-        vicinity_x = range(0, self.grid.x)
-        vicinity_y = range(0, self.grid.y)
+        manhattan_dist_x = range(max(px-d, 0), min(px+d+1, self.grid.x))
+        manhattan_dist_y = range(max(py-d, 0), min(py+d+1, self.grid.y))
 
-        # variables_x = range(px-d, px+d) #(0,4)
-        # variables_y = range(py-d, py+d) #(0,4)
-
-        variables_x = range(px-d, py+d)
-        variables_y = range(py-d, py+d)
-
-        
-        #(px-2, py-2), (px-1, py-1), (px, py-2), (px+1, py-1), (px+2, py), (px+1, py+1), (px, py+2), (px-1, py+1)
-        #(px-2, py-2), (px-1, py-1), (px-1, py+1), (px, py-2), (px, py+2), (px+1, py-1), (px+1, py+1), (px+2, py)
-
-        
-                
-
-        # for var in variables_x:
-        #     if var in vicinity_x :
-        #             self.grid[var][py].add(layer)
-
-        # for var1 in variables_y: 
-        #     if var1 in vicinity_y:
-        #         self.grid[px][var1].add(layer)
-
-
-            
-        
-        
-
-
+        for x in manhattan_dist_x: #0 - 5
+            for y in manhattan_dist_y: #0 -5
+                if abs(x-px) + abs(y-py) <= d:  
+                    self.grid[x][y].add(layer)
 
     def on_undo(self):
         """Called when an undo is requested."""
@@ -366,6 +343,9 @@ class MyWindow(arcade.Window):
     def on_decrease_brush_size(self):
         """Called when a decrease to the brush size is requested."""
         self.grid.decrease_brush_size()
+
+
+
 
 def main():
     """ Main function """
