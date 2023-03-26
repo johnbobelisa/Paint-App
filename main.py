@@ -308,8 +308,8 @@ class MyWindow(arcade.Window):
         vicinity_x = range(max(px-d, 0), min(px+d+1, self.grid.x))
         vicinity_y = range(max(py-d, 0), min(py+d+1, self.grid.y))
 
-        for x in vicinity_x: #0 - 5
-            for y in vicinity_y: #0 -5
+        for x in vicinity_x: 
+            for y in vicinity_y: 
                 if abs(x-px) + abs(y-py) <= d:  
                     self.grid[x][y].add(layer)
 
