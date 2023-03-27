@@ -9,6 +9,7 @@ class UndoTracker:
 
     def __init__(self) -> None:
         self.tree_of_actions = ArrayStack(10000)
+        self.redo_branch = ArrayStack(10000)
         
     def add_action(self, action: PaintAction) -> None:
         """
@@ -29,41 +30,25 @@ class UndoTracker:
         :return: The action that was undone, or None.
         """
         
+        if self.tree_of_actions.is_empty():
+            return None
+
         p_action:PaintAction = self.tree_of_actions.peek()
 
         if p_action == None:
-            return
+            exit()
         
         for step in p_action.steps:
             x, y = step.affected_grid_square
             layer_state = grid[x][y]
             
-            if layer_state.add == True:
+            if layer_state.erase(step.affected_layer) == False:
                 step.undo_apply(grid)
                 layer_state.is_undone = True
-                self.tree_of_actions.pop()
         
-        
-
-
-            # if layer_state == SetLayerStore():
-            #     if layer_state.current_layers != None:
-            #         step.undo_apply(grid)
-            #         layer_state.is_undone = True
-            #         self.tree_of_actions.pop()
-
-            # elif layer_state == AdditiveLayerStore():
-            #     if layer_state.add == True:
-            #         step.undo_apply(grid)
-            #         layer_state.is_undone = True
-            #         self.tree_of_actions.pop()
-
-            # elif layer_state == SequenceLayerStore():
-            #     if layer_state.add == True:
-            #         step.undo_apply(grid)
-            #         layer_state.is_undone = True
-            #         self.tree_of_actions.pop()
-
+        returned_action = self.tree_of_actions.pop()
+        self.redo_branch.push(returned_action)
+        return returned_action
 
 
     def redo(self, grid: Grid) -> PaintAction|None:
@@ -75,6 +60,7 @@ class UndoTracker:
         """
 
         p_action:PaintAction = self.tree_of_actions.pop()
+
 
         if p_action == None:
             return

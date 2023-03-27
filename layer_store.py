@@ -79,13 +79,19 @@ class SetLayerStore(LayerStore):
        
 
     def add(self, layer: Layer) -> bool:
-        self.current_layers = layer
-        return self.current_layers == layer
+        if self.current_layers != layer:
+            self.current_layers = layer
+            return True
+        else:
+            return False
         
      
     def erase(self, layer: Layer) -> bool:
-        self.current_layers = None
-        return self.current_layers == None
+        if self.current_layers != None:
+            self.current_layers = None
+            return True        
+        else:
+            return False
     
     def special(self):
         self.current_layers = invert
