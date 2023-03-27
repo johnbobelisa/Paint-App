@@ -57,37 +57,38 @@ class SetLayerStore(LayerStore):
 
     def __init__(self) -> None:
         super().__init__()
-        self.current_layer = None
+        self.current_layers = None
         self.current_color = None
+        self.is_undone = False
 
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
-        if self.current_layer == None:
+        if self.current_layers == None:
             self.current_color = start
             return start
 
-        elif self.current_layer == invert:
+        elif self.current_layers == invert:
             new_layer = invert.apply(self.current_color, 0, 1, 1)
             self.current_color = new_layer
             return self.current_color
             
         else:
-            new_layer = self.current_layer.apply(start, timestamp, x, y)
+            new_layer = self.current_layers.apply(start, timestamp, x, y)
             self.current_color = new_layer
             return new_layer
        
 
     def add(self, layer: Layer) -> bool:
-        self.current_layer = layer
-        return self.current_layer == layer
+        self.current_layers = layer
+        return self.current_layers == layer
         
      
     def erase(self, layer: Layer) -> bool:
-        self.current_layer = None
-        return self.current_layer == None
+        self.current_layers = None
+        return self.current_layers == None
     
     def special(self):
-        self.current_layer = invert
+        self.current_layers = invert
         
 
 
@@ -110,6 +111,7 @@ class AdditiveLayerStore(LayerStore):
         
         self.current_layers = CircularQueue(100*layer_counter)
         self.current_color = None
+        self.is_undone = False
         super().__init__()
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
@@ -139,8 +141,8 @@ class AdditiveLayerStore(LayerStore):
         return True
         
     def erase(self, layer: Layer) -> bool:
-        self.current_layers.serve()
-        return True
+        temp = self.current_layers.serve()
+        return temp == Layer
     
     def special(self):
         stack = ArrayStack(100)
@@ -174,6 +176,7 @@ class SequenceLayerStore(LayerStore):
         self.current_layers = ArraySortedList(1)
         self.applying = BSet(10)
         self.not_applying = BSet(10)
+        self.is_undone = False
         self.current_color = None
 
 
@@ -216,6 +219,7 @@ class SequenceLayerStore(LayerStore):
         
         self.applying.add(layer.index+1)
         return True
+        
 
 
     def erase(self, layer: Layer) -> bool:
