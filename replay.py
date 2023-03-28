@@ -17,10 +17,6 @@ class ReplayTracker:
         """
         self.is_replay = True
         
-        for _ in range(self.replay_actions.length+1):
-            self.play_next_action()
-        
-        
             
     def add_action(self, action: PaintAction, is_undo: bool=False) -> None:
         """

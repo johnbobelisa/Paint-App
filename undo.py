@@ -60,5 +60,3 @@ class UndoTracker:
         """
         temp_storage = self.redo_branch.pop()            
         self.tree_of_actions.push(temp_storage)
-
-        return temp_storage
