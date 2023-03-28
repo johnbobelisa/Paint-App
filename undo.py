@@ -58,19 +58,5 @@ class UndoTracker:
 
         :return: The action that was redone, or None.
         """
-
-        p_action:PaintAction = self.tree_of_actions.pop()
-
-
-        if p_action == None:
-            return
-
-        for step in p_action.steps:
-            x, y = step.affected_grid_square
-            layer_state = grid[x][y]
-            
-            if layer_state.is_undone == True:
-                step.redo_apply(grid)    
-
-            else:
-                return None
+        temp_storage = self.redo_branch.pop()            
+        self.tree_of_actions.push(temp_storage)

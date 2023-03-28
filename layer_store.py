@@ -147,8 +147,8 @@ class AdditiveLayerStore(LayerStore):
         return True
         
     def erase(self, layer: Layer) -> bool:
-        temp = self.current_layers.serve()
-        return temp == Layer
+        self.current_layers.serve()
+        return True
     
     def special(self):
         stack = ArrayStack(100)
@@ -272,6 +272,6 @@ class SequenceLayerStore(LayerStore):
             if elems == None:
                 break
             new_layer = elems.value
-            self.add(new_layer)                 #problem is here!
+            self.add(new_layer)                 
 
         

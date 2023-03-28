@@ -5,6 +5,7 @@ from grid import Grid
 from layer_util import get_layers, Layer
 from layers import lighten
 from layer_store import *
+from undo import *
 
 class MyWindow(arcade.Window):
     """ Painter Window """
