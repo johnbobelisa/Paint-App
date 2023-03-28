@@ -16,7 +16,7 @@ class Grid:
     MAX_BRUSH = 5
     MIN_BRUSH = 0
 
-    def __init__(self, draw_style, x, y) -> None:
+    def __init__(self, draw_style, x:int, y:int) -> None:
         """
         Initialise the grid object.
         - draw_style:
@@ -31,25 +31,31 @@ class Grid:
         self.draw_style = draw_style
         self.x = x
         self.y = y
-        self.brush_size = self.DEFAULT_BRUSH_SIZE
+        self.brush_size:int = self.DEFAULT_BRUSH_SIZE
 
-        self.grid = ArrayR(x)      # Create an array of size x
+        self.grid = ArrayR(x)      
 
-        for i in range(x):    # Outer loop iterates x times        
-            self.grid[i] = ArrayR(y)    #Creates a "mini array" inside the array at index i
-            for j in range(y):          #inner loop iterates y times
-                if self.draw_style == self.DRAW_STYLE_SET: #set the "mini array" that is accessed by i and j as a                                                     
-                    self.grid[i][j] = SetLayerStore()      #layer store according to self.draw style 
+        for i in range(x):                  
+            self.grid[i] = ArrayR(y)    
+            for j in range(y):          
+                if self.draw_style == self.DRAW_STYLE_SET:                                                      
+                    self.grid[i][j] = SetLayerStore()      
                 elif self.draw_style == self.DRAW_STYLE_ADD:   
                     self.grid[i][j] = AdditiveLayerStore()
                 elif self.draw_style == self.DRAW_STYLE_SEQUENCE:
                     self.grid[i][j] = SequenceLayerStore()
 
-
+    #How the grid works:
+    #1.Set the grid to an empty(None Value) array of length x, where x is the width of the grid (line 36)
+    #2.For each "space" created, we want to fill that space with an array of length y, where y is the height of the grid (line 38-39)
+    #3.For each "space" created in the array of length y, we want to set these values to a LayerStore depending on the draw style (line 40-46)
+    
        
     def __getitem__(self, index):
-        return self.grid[index]
-
+        return self.grid[index] 
+    
+    #4.So now getting a certain "space" of grid[x][y] at a certain index is just grabbing the information from the
+    #smaller array inside the grid, and so this is the purpose of __getitem__ 
     
     def increase_brush_size(self):
         """
@@ -61,7 +67,7 @@ class Grid:
         if self.brush_size < self.MAX_BRUSH:
             self.brush_size += 1
 
-        # raise NotImplementedError()
+         
 
     def decrease_brush_size(self):
         """
@@ -83,6 +89,8 @@ class Grid:
         for i in range(self.x):
             for j in range(self.y):
                 self.grid[i][j].special()
+        
+        
                 
 
             

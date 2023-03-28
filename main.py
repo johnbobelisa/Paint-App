@@ -346,8 +346,6 @@ class MyWindow(arcade.Window):
         self.grid.decrease_brush_size()
 
 
-
-
 def main():
     """ Main function """
     window = MyWindow()
