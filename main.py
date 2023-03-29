@@ -320,7 +320,7 @@ class MyWindow(arcade.Window):
                     self.steps.append(PaintStep((x,y), layer))
         
         self.undo_tracker.add_action(PaintAction(self.steps[:], False))
-        self.replay_tracker.add_action(PaintAction(self.steps[:], False), False)
+        self.replay_tracker.add_action(PaintAction(self.steps[:], False))
         self.steps.clear()
 
     def on_undo(self):

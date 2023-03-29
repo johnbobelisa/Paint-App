@@ -352,20 +352,24 @@ class SequenceLayerStore(LayerStore):
             if layers == None:  #if condition is met then we have accounted for all the layers
                     break
             for items in elements:  #for all the items in the element
-                if items.value == layers.value: #if their layer.value is the same
+                if layers.value == items.value: #if their layer.value is the same
                     temporary_layers.add(items) #we add the items to the temporary sorted list
                     
-        n = temporary_layers.length 
+        n = len(temporary_layers)
 
         if n % 2 == 0:
             the_index = (n // 2) - 1 #if it's an even number of applying layers, select the lexicographically smaller of the two names
         else:
             the_index = n // 2 # Otherwise, select the median applying one
 
-
+        if temporary_layers.is_empty():
+            return
+        
         temporary_layers.delete_at_index(the_index) #delete the median applying layer at the given index
         self.current_layers = ArraySortedList(0) #reset the current layers
         
+        
+
         for elems in temporary_layers: #for items in the new sorted list
             elems:ListItem
             if elems == None:

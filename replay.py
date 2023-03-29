@@ -26,16 +26,11 @@ class ReplayTracker:
         `is_undo` specifies whether the action was an undo action or not.
         Special, Redo, and Draw all have this is False.
         """
-        if self.is_replay == True:
+        
+        if self.is_replay:
             return
-        else:
-            if action == None:
-                return
-
-            if is_undo == True:
-                action.is_special = None
-
-            self.replay_actions.append(action)
+        
+        self.replay_actions.append((action, is_undo))
 
 
     def play_next_action(self, grid: Grid) -> bool:
@@ -46,21 +41,15 @@ class ReplayTracker:
             - Otherwise, return False.
         """
 
-        if self.replay_actions.is_empty():
-            return True
-
-        else:
-            actions:PaintAction = self.replay_actions.serve()
-
-            if actions == None:
-                return
-
-            if actions.is_special != False and actions.is_special != True: #Means that is_undo == True
-                actions.undo_apply(grid)
+        if not self.replay_actions.is_empty():
+            action, is_undo = self.replay_actions.serve()
+            action:PaintAction
+            if is_undo:
+                action.undo_apply(grid)
             else:
-                actions.redo_apply(grid)
-
+                action.redo_apply(grid)
             return False
+        return True
 
             
 if __name__ == "__main__":
