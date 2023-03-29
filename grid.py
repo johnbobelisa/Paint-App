@@ -24,6 +24,10 @@ class Grid:
             Should be one of DRAW_STYLE_OPTIONS
             This draw style determines the LayerStore used on each grid square.
         - x, y: The dimensions of the grid.
+        
+
+        the code iterates over the x and y inputs of the grid using nested loops, where
+        x and y are the dimensions of the grid. Hence, the time complexity is O(xy).
 
         Should also intialise the brush size to the DEFAULT provided as a class variable.
         """
@@ -35,15 +39,16 @@ class Grid:
 
         self.grid = ArrayR(x)      
 
-        for i in range(x):                  
+        for i in range(x):                  #O(x) time complexity, where x is the width 
             self.grid[i] = ArrayR(y)    
-            for j in range(y):          
-                if self.draw_style == self.DRAW_STYLE_SET:                                                      
-                    self.grid[i][j] = SetLayerStore()      
+            for j in range(y):              #O(y) time complexity, where y is the height
+                if self.draw_style == self.DRAW_STYLE_SET:                                 
+                    self.grid[i][j] = SetLayerStore()       #O(1)         
                 elif self.draw_style == self.DRAW_STYLE_ADD:   
-                    self.grid[i][j] = AdditiveLayerStore()
+                    self.grid[i][j] = AdditiveLayerStore()     #O(1)
                 elif self.draw_style == self.DRAW_STYLE_SEQUENCE:
-                    self.grid[i][j] = SequenceLayerStore()
+                    self.grid[i][j] = SequenceLayerStore()  #O(1)
+        
 
     #How the grid works:
     #1.Set the grid to an empty(None Value) array of length x, where x is the width of the grid (line 36)
@@ -62,10 +67,14 @@ class Grid:
         Increases the size of the brush by 1,
         if the brush size is already MAX_BRUSH,
         then do nothing.
+
+        The time complexity is constant as we are using an arithmetic operation (addition)
+        to increment the size of the brush
+
         """
 
-        if self.brush_size < self.MAX_BRUSH:
-            self.brush_size += 1
+        if self.brush_size < self.MAX_BRUSH:    #O(1)
+            self.brush_size += 1    #O(1)
 
          
 
@@ -74,21 +83,26 @@ class Grid:
         Decreases the size of the brush by 1,
         if the brush size is already MIN_BRUSH,
         then do nothing.
+
+        The time complexity is constant as we are using an arithmetic operation (subtraction)
+        to decrement the size of the brush
+
         """
 
-        if self.brush_size > self.MIN_BRUSH:
-            self.brush_size -= 1
+        if self.brush_size > self.MIN_BRUSH: #O(1)
+            self.brush_size -= 1 #O(1)
             
-        
-        # raise NotImplementedError()
 
     def special(self):
         """
         Activate the special affect on all grid squares.
+
+        the code iterates over the x and y inputs of the grid using nested loops, where
+        x and y are the dimensions of the grid. Hence, the time complexity is O(xy).
         """
-        for i in range(self.x):
-            for j in range(self.y):
-                self.grid[i][j].special()
+        for i in range(self.x):     #O(x)
+            for j in range(self.y): #O(y)
+                self.grid[i][j].special() #O(1)
         
         
                 

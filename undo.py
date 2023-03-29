@@ -51,6 +51,7 @@ class UndoTracker:
 
         :return: The action that was redone, or None.
         """
+
         if self.redo_branch.is_empty():
             return None
         

@@ -54,43 +54,85 @@ class SetLayerStore(LayerStore):
     """
 
     def __init__(self) -> None:
+        """
+        The time complexity for initializing self.current_layers and self.current_color is O(1)
+        self.current_layers keeps track of the current layer
+        self.current_color keeps track of the current color
+        
+        The time complexity is O(1), we are just initializing variables.
+        """
         super().__init__()
-        self.current_layers = None  #Keeps track of the current layer
-        self.current_color = None   #Keeps track of the current color
+        self.current_layers = None  #O(1)
+        self.current_color = None   #O(1)
         
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
-        if self.current_layers == None: #If the color has no layers
-            self.current_color = start  #we set the current color to the given start parameter
-            return start                #and return start
+        """
+        The time complexity of get_color is O(1)
+
+        How get_color works:
+        1. If the color has no layers, we set the current color to the given start parameter, and return start. 
+        2. If the current layer is invert, we apply it to the current color, and update the current color with the new color,
+        and then we return the current color.
+        3. Otherwise, we apply the layer to the start color, update the current color with the new one, and return it.
+
+        The time complexity for get_color, for all the conditions/steps above is O(1), the most we are doing is updating
+        a variable and returning it. The apply method has constant time complexity as it will always apply to a tuple of 
+        (r,g,b) values or applying a layer like 'black' just means we are drawing black.
+
+        """
+        if self.current_layers == None: 
+            self.current_color = start      #O(1)
+            return start                    #O(1)
         
-        elif self.current_layers == invert:                       #If the current layer is invert
-            new_layer = invert.apply(self.current_color, 0, 1, 1) #we apply it to the current color
-            self.current_color = new_layer                        #and update it with the new color
-            return self.current_color                             #and then we return the current color
+        elif self.current_layers == invert:                       
+            new_layer = invert.apply(self.current_color, timestamp, x, y) #O(1)
+            self.current_color = new_layer                                #O(1)
+            return self.current_color                                     #O(1)
             
         else:
-            new_layer = self.current_layers.apply(start, timestamp, x, y) #Otherwise, we apply the layer to the start color
-            self.current_color = new_layer                                #update the current color with the new one
-            return new_layer                                              #and return it 
+            new_layer = self.current_layers.apply(start, timestamp, x, y) #O(1)
+            self.current_color = new_layer                                #O(1)
+            return new_layer                                              #O(1)
        
 
-    def add(self, layer: Layer) -> bool: 
-        if self.current_layers != layer: #If the layer we're adding is not the current layer,
-            self.current_layers = layer  #it means that adding this layer will change the state of the layerstore
-            return True                  #And so we return True
+    def add(self, layer: Layer) -> bool:
+        """
+        If the layer we're adding is not the current layer, it means that adding this layer will 
+        change the state of the layerstore, And so we return True. Otherwise, if the layerstore hasn't changed, return False.
+
+        The time complexity is O(1), we are not doing any iterations or complex functions, we are just updating and checking
+        a variable and returning a boolean. 
+        """ 
+        if self.current_layers != layer: #O(1)
+            self.current_layers = layer  #O(1)
+            return True                  #O(1)
         else:
-            return False                 #Otherwise, if the layerstore hasn't changed, return False
+            return False                 #O(1)
         
      
     def erase(self, layer: Layer) -> bool:
-        if self.current_layers != None:  #Erasing a layer just means setting the current layer to None,
-            self.current_layers = None   #so if there exists a current layer that is not None,  
-            return True                  #We return True as we are changing the state of the layer
+        """
+        Erasing a layer just means setting the current layer to None,
+        so if there exists a current layer that is not None, We return True as we are changing the state of the layer.
+        Otherwise, if the layerstore hasn't changed, return False
+
+        The time complexity is O(1) since we are just updating a variable and returning 
+        a boolean without doing any iterations, etc.
+        """
+        if self.current_layers != None:  
+            self.current_layers = None   #O(1)
+            return True                  #O(1)
         else:
-            return False                 #Otherwise, if the layerstore hasn't changed, return False
+            return False                 #O(1)
     
     def special(self):
-        self.current_layers = invert     #Set the layer to invert
+        """
+        Set the current layer to invert.
+
+        The time complexity is O(1) since we are just updating a variable without doing any iterations, etc.
+        """
+        if self.current_layers != invert:
+            self.current_layers = invert     #O(1)
         
 
 
@@ -104,57 +146,109 @@ class AdditiveLayerStore(LayerStore):
     
 
     def __init__(self) -> None:
-        self.layer_counter = 0   #keep track of the amount of layers
-        temp = get_layers()
-        for layer in temp:      
+        """
+        self.layer_counter: keeps track of the amount of layers, Counts the amount of layers until it returns a None value,
+        which means all the layers have been counted for.
+
+        self.current_layers: A CircularQueue where the capacity is set to 100 times the amount of layers
+        self.current_color: Keeps track of the current color. Initially None
+
+        The time complexity is O(n). the iteration has a linear time complexity proportional to the number of layers.
+        """
+        self.layer_counter = 0  #O(1)
+        temp = get_layers()     
+        for layer in temp:      #O(n), where n is the amount of layers in the collection
             if layer == None:
                 break
-            self.layer_counter += 1  #Counts the amount of layer until it returns a None value,
-                                #which means all the layers have been counted for 
+            self.layer_counter += 1  #O(1)
+                                
         
-        self.current_layers = CircularQueue(100*self.layer_counter) #Set the Queue capacity to 100 times the amount of layers
-        self.current_color = None   #Keeps track of the current color
-        super().__init__()
+        self.current_layers = CircularQueue(100*self.layer_counter) #O(1)
+        self.current_color = None   #O(1)
+        super().__init__() 
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
+        """
+        If there are no layers, set the current color to the given start color and return it.
 
-        if self.current_layers.is_empty():  #If there are no layers,
-            self.current_color = start      #Set the current color to the given start color
-            return start                    #and return it
+        Otherwise, we iterate over the amount of layers in the queue. 
+
+        If there isn't a color yet,  we remove and take the oldest remaining layer, then append it back to the queue. 
+        Then, apply the oldest remaining layer to the 'start' color, and update the current color with it.
+
+        else, we follow the same set of instructions as above, the only difference is that we apply the oldest remaning layer
+        to the current color instead of the 'start' color.
+
+        Finally, return the current color.
+
+        The time complexity of get_color is O(n), where n is the number of layers in the queue. 
+        he code iterates over the number of layers in the queue and performs a constant amount of operations.
+
+        """
+
+        if self.current_layers.is_empty():  
+            self.current_color = start      #O(1)
+            return start                    #O(1)
 
         else:
-            for _ in range(self.current_layers.length):         #iterates over the amount of layers in the queue
-                if self.current_color == None:                  #If there isn't a color yet, 
-                    new_layer:Layer = self.current_layers.serve()     #we take the oldest remaining layer
-                    self.current_layers.append(new_layer)       #then append it back to the queue
-                    served_layer = new_layer.apply(start, timestamp , x, y) #apply the oldest remaining layer to the 'start' color
-                    self.current_color = served_layer   #and update the current color with it 
+            for _ in range(self.current_layers.length):  #O(n)       
+                if self.current_color == None:                      
+                    new_layer:Layer = self.current_layers.serve()     #O(1)
+                    self.current_layers.append(new_layer)              #O(1)
+                    served_layer = new_layer.apply(start, timestamp , x, y) #O(1) 
+                    self.current_color = served_layer   #O(1)
                 else:
-                    new_layer:Layer = self.current_layers.serve()     #Otherwise, we follow the same set of instructions as above,
-                    self.current_layers.append(new_layer)       #the only difference is that we apply the oldest remaning layer
-                    served_layer = new_layer.apply(self.current_color, timestamp, x, y) #to the current color instead of
-                    self.current_color = served_layer                                   #the 'start' color
+                    new_layer:Layer = self.current_layers.serve()               #O(1)     
+                    self.current_layers.append(new_layer)                       #O(1)
+                    served_layer = new_layer.apply(self.current_color, timestamp, x, y) #O(1)
+                    self.current_color = served_layer   #O(1)                                
 
-            return self.current_color #return the current color
+            return self.current_color #O(1)
 
 
     def add(self, layer: Layer) -> bool:
-        self.current_layers.append(layer) #set the current layer to the given layer
-        return True
-        
+        """
+        Set the current layer to the given layer if layer is a valid parameter, and return True.
+        Otherwise, return False.
+
+        The time complexity is O(1), we are only appending an item into the rear of the queue and returning
+        a boolean.
+        """
+        if layer:
+            self.current_layers.append(layer) 
+            return True
+        else:
+            return False
     def erase(self, layer: Layer) -> bool:
-        self.current_layers.serve() #take out the oldest remaining layer
+        """
+        Remove the oldest remaining layer in the self.current_layers queue.
+
+        The time complexity is O(1), we are only removing a layer from the front of the queue.
+        """
+        self.current_layers.serve() 
         return True
     
     def special(self):
-        stack = ArrayStack(100*self.layer_counter)      #How special works:                                             
-        while self.current_layers.is_empty() == False:  #1. Create a stack with the same capacity as the queue
-            served_layer = self.current_layers.serve()  #2. take out all the elements in the queue until it's empty and push
-            stack.push(served_layer)                    # all the elements into the stack
+        """
+        Create a stack with the same capacity as the queue, take out all the elements in the queue until it's empty and push
+        all the elements into the stack. Then, take out all the elements in the stack until it's empty, and push all the 
+        elements back into the queue. Now, all the elements in the queue will be in a reversed order.
+
+        The time complexity is O(n), where n is the number of layers in the queue.
+        This is because the code iterates over the entire queue twice: once to empty the queue and push 
+        all the elements into the stack, and a second time to empty the stack and push it back into the queue to reverse it. 
+
+        Although we are iterating over the queue twice, the size of the queue is still n, and therefore, the time complexity is O(n).
+
+        """
+        stack = ArrayStack(100*self.layer_counter)                                           
+        while self.current_layers.is_empty() == False:  
+            served_layer = self.current_layers.serve()  
+            stack.push(served_layer)                    
         
-        while stack.is_empty() == False:                #3. take out all the elements in the stack until it's empty and push all
-            peeked_layer = stack.peek()                 #the elements back into the queue. Now, all the elements in the queue,
-            stack.pop()                                 #will be in a reversed order
+        while stack.is_empty() == False:                
+            peeked_layer = stack.peek()                 
+            stack.pop()                                 
             self.current_layers.append(peeked_layer)
         
 
@@ -173,11 +267,19 @@ class SequenceLayerStore(LayerStore):
     
 
     def __init__(self) -> None:
+        """
+        self.current_layers: Keeps track of the current layers using an array sorted list
+        self.applying: Keeps track of the 'applying' layers using a set
+        self.not_applying: Keeps track of the 'non-applying' layers using a set
+        self.current_color: Keeps track of the current color
+
+        The time complexity of initialising all these variables are O(1)
+        """
         super().__init__()
-        self.current_layers = ArraySortedList(1) #Keeps track of the current layers
-        self.applying = BSet(10)    #Keeps track of the 'applying' layers
-        self.not_applying = BSet(10)    #Keeps track of the 'non-applying' layers
-        self.current_color = None   #Keeps track of the current color
+        self.current_layers = ArraySortedList(1) 
+        self.applying = BSet(10)    
+        self.not_applying = BSet(10)    
+        self.current_color = None   
 
 
     def get_color(self, start, timestamp, x, y) -> tuple[int, int, int]:
