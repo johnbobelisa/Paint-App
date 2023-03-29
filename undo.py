@@ -8,8 +8,8 @@ from data_structures.stack_adt import *
 class UndoTracker:
 
     def __init__(self) -> None:
-        self.tree_of_actions = ArrayStack(10000)
-        self.redo_branch = ArrayStack(10000)
+        self.tree_of_actions = ArrayStack(10000)   #Stack that acts as the tree of actions
+        self.redo_branch = ArrayStack(10000)       
         
     def add_action(self, action: PaintAction) -> None:
         """
@@ -19,7 +19,7 @@ class UndoTracker:
         feel free to exit early and not add the action.
         """
 
-        self.tree_of_actions.push(action)
+        self.tree_of_actions.push(action) #add an action to the stack
 
 
     def undo(self, grid: Grid) -> PaintAction|None:
@@ -35,16 +35,7 @@ class UndoTracker:
 
         p_action:PaintAction = self.tree_of_actions.peek()
 
-        if p_action == None:
-            exit()
-        
-        for step in p_action.steps:
-            x, y = step.affected_grid_square
-            layer_state = grid[x][y]
-            
-            if layer_state.erase(step.affected_layer) == False:
-                step.undo_apply(grid)
-                layer_state.is_undone = True
+        p_action.undo_apply(grid)
         
         returned_action = self.tree_of_actions.pop()
         self.redo_branch.push(returned_action)
@@ -58,5 +49,12 @@ class UndoTracker:
 
         :return: The action that was redone, or None.
         """
-        temp_storage = self.redo_branch.pop()            
+        if self.redo_branch.is_empty():
+            return None
+        
+        temp_storage:PaintAction = self.redo_branch.pop()
+
+        temp_storage.redo_apply(grid)
+            
         self.tree_of_actions.push(temp_storage)
+        return temp_storage

@@ -16,6 +16,7 @@ class ReplayTracker:
         Useful if you have any setup to do before `play_next_action` should be called.
         """
         self.is_replay = True
+
         
             
     def add_action(self, action: PaintAction, is_undo: bool=False) -> None:
@@ -43,18 +44,17 @@ class ReplayTracker:
             - Otherwise, return False.
         """
 
-        for _ in range(self.replay_actions.length+1):
-            if self.replay_actions.is_empty():
-                return True
+        if self.replay_actions.is_empty():
+            return True
 
+        else:
+            actions:PaintAction = self.replay_actions.serve()
+
+            if actions.is_special == None: #Means that is_undo == True
+                actions.undo_apply(grid)
             else:
-                actions:PaintAction = self.replay_actions.serve()
-
-                if actions.is_special == None: #Means that is_undo == True
-                    actions.undo_apply(grid)
-                else:
-                    actions.redo_apply(grid)
-                return False
+                actions.redo_apply(grid)
+            return False
 
             
 if __name__ == "__main__":
