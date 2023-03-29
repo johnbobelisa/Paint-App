@@ -28,7 +28,6 @@ class ReplayTracker:
         """
         if self.is_replay == True:
             return
-        
         else:
             if is_undo == True:
                 action.is_special = None
@@ -50,10 +49,11 @@ class ReplayTracker:
         else:
             actions:PaintAction = self.replay_actions.serve()
 
-            if actions.is_special == None: #Means that is_undo == True
+            if actions.is_special != False and actions.is_special != True: #Means that is_undo == True
                 actions.undo_apply(grid)
             else:
                 actions.redo_apply(grid)
+                
             return False
 
             

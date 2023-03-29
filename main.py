@@ -320,7 +320,7 @@ class MyWindow(arcade.Window):
                     self.steps.append(PaintStep((x,y), layer))
         
         self.undo_tracker.add_action(PaintAction(self.steps[:], False))
-        self.replay_tracker.add_action(PaintAction(self.steps[:]), False)
+        self.replay_tracker.add_action(PaintAction(self.steps[:], False), False)
         self.steps.clear()
 
     def on_undo(self):
@@ -329,7 +329,8 @@ class MyWindow(arcade.Window):
 
     def on_redo(self):
         """Called when a redo is requested."""
-        self.undo_tracker.redo(self.grid)
+        a = self.undo_tracker.redo(self.grid)
+        self.replay_tracker.add_action(a, True)
 
     def on_special(self):
         """Called when the special action is requested."""
@@ -337,15 +338,14 @@ class MyWindow(arcade.Window):
 
     def on_replay_start(self):
         """Called when the replay starting is requested."""
-        for _ in range(self.replay_tracker.replay_actions.length):
-            self.replay_tracker.play_next_action(self.grid)
-
+        self.replay_tracker.play_next_action(self.grid)
+        
     def on_replay_next_step(self) -> bool:
         """
         Called when the next step of the replay is requested.
         Returns whether the replay is finished.
         """
-        self.replay_tracker.play_next_action(self.grid)
+        return self.replay_tracker.play_next_action(self.grid)
 
     def on_increase_brush_size(self):
         """Called when an increase to the brush size is requested."""

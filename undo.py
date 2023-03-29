@@ -37,7 +37,9 @@ class UndoTracker:
 
         p_action.undo_apply(grid)
         
-        returned_action = self.tree_of_actions.pop()
+        returned_action:PaintAction = self.tree_of_actions.pop()
+        returned_action.is_special = None     
+
         self.redo_branch.push(returned_action)
         return returned_action
 
