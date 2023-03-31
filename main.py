@@ -290,65 +290,169 @@ class MyWindow(arcade.Window):
     # STUDENT PART
 
     def on_init(self):
-        """Initialisation that occurs after the system initialisation."""
-        self.steps = []
-        self.undo_tracker = UndoTracker()
-        self.replay_tracker = ReplayTracker()
+        """
+        Args:
+            self
+        Raises:
+            None
+        Returns:
+            None
+        What it does:
+            Initialisation that occurs after the system initialisation.
+            Initializes the steps for every painted action, and initializes
+            the undo and replay tracker. 
+        Complexity:
+            Best case == Worst case == O(1)
+        """
+        self.steps = [] #O(1)
+        self.undo_tracker = UndoTracker() #O(1)
+        self.replay_tracker = ReplayTracker() #O(1)
 
     def on_reset(self):
-        """Called when a window reset is requested."""
-        pass
-
-    def on_paint(self, layer: Layer, px, py):
         """
-        Called when a grid square is clicked on, which should trigger painting in the vicinity.
-        Vicinity squares outside of the range [0, GRID_SIZE_X) or [0, GRID_SIZE_Y) can be safely ignored.
-
-        layer: The layer being applied.
-        px: x position of the brush.
-        py: y position of the brush.
+        Args:
+            self
+        Raises:
+            None
+        Returns:
+            None
+        What it does:
+            Called when a window reset is requested.
+        Complexity:
+            Best case == Worst Case == O(1)    
         """
-        d = self.grid.brush_size
-        
-        vicinity_x = range(max(px-d, 0), min(px+d+1, self.grid.x))
-        vicinity_y = range(max(py-d, 0), min(py+d+1, self.grid.y))
+        self.on_init() #O(1)
 
-        for x in vicinity_x: 
-            for y in vicinity_y: 
-                if abs(x-px) + abs(y-py) <= d:  
-                    self.grid[x][y].add(layer)
-                    self.steps.append(PaintStep((x,y), layer))
+    def on_paint(self, layer: Layer, px:int, py:int):
+        """
+        Args:
+            layer:Layer
+            px:int
+            py:int
+        Raises:
+            TypeError -- if layer is not of Layer type, if px or py is not of int type
+        Returns:
+            None
+        What it does:
+            Called when a grid square is clicked on, which should trigger painting in the vicinity.
+            Vicinity squares outside of the range [0, GRID_SIZE_X) or [0, GRID_SIZE_Y) can be safely ignored.
+
+            layer: The layer being applied.
+            px: x position of the brush.
+            py: y position of the brush.
+
+        Complexity:
+        Best case complexity == Worst case complexity == O(x*y + n)
+        Traverses through the vicinity and access the value and stores them to x and y,
+        then we add a layer which has O(n) worst case complexity. 
+        """
+        if not isinstance(px, int): #O(1)
+            raise TypeError("px value must be int")
+        if not isinstance(py, int): #O(1)
+            raise TypeError("py value must be int")
+        if not isinstance(layer, Layer): #O(1)
+            raise TypeError("layer value must be of Layer type")
         
-        self.undo_tracker.add_action(PaintAction(self.steps[:], False))
-        self.replay_tracker.add_action(PaintAction(self.steps[:], False))
-        self.steps.clear()
+
+        d:int = self.grid.brush_size #O(1)
+        
+        vicinity_x:range = range(max(px-d, 0), min(px+d+1, self.grid.x)) #O(1)
+        vicinity_y:range = range(max(py-d, 0), min(py+d+1, self.grid.y)) #O(1)
+
+        x:int
+        y:int
+        for x in vicinity_x: #O(x) -- where x is the size of the vicinity
+            for y in vicinity_y: #O(y) -- where y is the size of the vicinity
+                if abs(x-px) + abs(y-py) <= d: #O(1)
+                    self.grid[x][y].add(layer) #O(n) 
+                    self.steps.append(PaintStep((x,y), layer)) #O(1)
+        
+        self.undo_tracker.add_action(PaintAction(self.steps[:], False)) #O(1)
+        self.replay_tracker.add_action(PaintAction(self.steps[:], False)) #O(1)
+        self.steps.clear() #O(1)
 
     def on_undo(self):
-        """Called when an undo is requested."""
-        a = self.undo_tracker.undo(self.grid)
-        self.replay_tracker.add_action(a, True)
+        """
+        Args:
+            self
+        Raises:
+            None
+        Returns:
+            None
+        What it does:
+            Called when an undo is requested and undoes an action.
+        Complexity:
+            Best case complexity == Worst case complexity == O(n)
+        """
+        a = self.undo_tracker.undo(self.grid) #O(n) -- where n is the length of undo_tracker tree of actions
+        self.replay_tracker.add_action(a, True) #O(1)
 
 
     def on_redo(self):
-        """Called when a redo is requested."""
-        b = self.undo_tracker.redo(self.grid)
-        self.replay_tracker.add_action(b, False)
+        """
+        Args:
+            self
+        Raises:
+            None
+        Returns:
+            None
+        What it does:
+            Called when a redo is requested and redo the action.
+        Complexity:
+            Best case complexity == Worst case complexity == O(n)
+        """
+        b = self.undo_tracker.redo(self.grid) #O(n) where n is the length of the redo_branch 
+        self.replay_tracker.add_action(b, False) #O(n)
 
     def on_special(self):
-        """Called when the special action is requested."""
-        self.grid.special()
+        """
+        Args:
+            self
+        Raises:
+            None
+        Returns:
+            None
+        What it does:
+            Called when the special action is requested and activate grid's special method.
+        Complexity:
+            the grid method iterates through x and y where they are the dimensions of the grid
+
+            Best case complexity == Worst case complexity == O(xy)
+        """
+        self.grid.special() #O(xy) -- x,y is the dimension of the grid
 
     def on_replay_start(self):
-        """Called when the replay starting is requested."""
-        self.replay_tracker.play_next_action(self.grid)
+        """
+        Args:
+            self
+        Raises:
+            None
+        Returns:
+            None
+        What it does:
+            Called when the replay starting is requested. Plays the replay. 
+        Complexity:
+            Worst case complexity == Best case complexity == O(n)
+        """
+
+        self.replay_tracker.play_next_action(self.grid) #O(n) where n is the length of replayactions queue
         
 
     def on_replay_next_step(self) -> bool:
         """
-        Called when the next step of the replay is requested.
-        Returns whether the replay is finished.
+        Args:
+            self
+        Raises:
+            None
+        Returns:
+            bool
+        What it does:
+            Called when the next step of the replay is requested.
+            Returns whether the replay is finished.
+        Complexity:
+            Worst case complexity == Best case complexity == O(n)
         """
-        return self.replay_tracker.play_next_action(self.grid)
+        return self.replay_tracker.play_next_action(self.grid) #O(n) where n is the length of replayactions queue
 
     def on_increase_brush_size(self):
         """Called when an increase to the brush size is requested."""
